@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="snowflake-source" content="cortex-agent-authored">
+<title>Wealth Advisor Assistant · Snowflake example</title>
+<meta name="description" content="Help advisors prioritize their day with next best actions, client prep, and an AI coach that only sees each advisor's own clients. A Snowflake example on synthetic data.">
+<script type="application/json" id="snowflake-report-metadata">
+{
+  "generated": "2026-11-12",
+  "intent": "GitHub Pages guide for the Wealth Advisor Assistant Snow Pack (synthetic data)",
+  "dataSources": [
+    { "type": "file", "path": "docs/images/*.png" },
+    { "type": "file", "path": "sql/setup.sql" }
+  ],
+  "sections": [
+    { "id": "problem", "title": "The problem", "producerNotes": "Static copy from the build brief" },
+    { "id": "walkthrough", "title": "Walkthrough", "dataSources": [{ "type": "file", "path": "docs/images/*.png" }], "producerNotes": "Screenshots of the running app in no-account mode; recapture when the UI changes" },
+    { "id": "how-it-works", "title": "How it works", "dataSources": [{ "type": "file", "path": "sql/setup.sql" }], "producerNotes": "Capabilities verified in live mode on 2026-11-12" },
+    { "id": "get-started", "title": "Get started", "producerNotes": "Mirrors README quick start and live steps" },
+    { "id": "limits", "title": "Limits and disclaimer", "producerNotes": "Mirrors README known limitations" }
+  ]
+}
+</script>
+<style>
+:root {
+  color-scheme: light dark;
+  --bg: light-dark(#f6f7fb, #0d1220);
+  --card: light-dark(#ffffff, #141b2d);
+  --card-2: light-dark(#f0f2f8, #1b2439);
+  --border: light-dark(#dde1ec, #2a3550);
+  --text: light-dark(#141a2e, #e8ecf6);
+  --text-2: light-dark(#4a5373, #aab3cc);
+  --muted: light-dark(#6b7493, #8590ad);
+  --accent: light-dark(#1a6fd1, #5aa7f5);
+  --accent-soft: light-dark(rgba(26,111,209,.1), rgba(90,167,245,.14));
+  --warn-soft: light-dark(#fff6e6, #2b2414);
+  --warn-border: light-dark(#f0c36d, #6b5420);
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-font-smoothing: antialiased; }
+a { color: var(--accent); }
+img, svg { max-width: 100%; height: auto; }
+.wrap { max-width: 1080px; width: 100%; margin: 0 auto; padding: 0 clamp(16px, 4vw, 28px); }
+header.top { border-bottom: 1px solid var(--border); background: var(--card); }
+header.top .wrap { display: flex; align-items: center; gap: 12px; padding-top: 14px; padding-bottom: 14px; flex-wrap: wrap; }
+.mark { width: 30px; height: 30px; border-radius: 8px; background: var(--accent); display: grid; place-items: center; }
+.brand { font-weight: 650; }
+.brand small { display: block; color: var(--muted); font-weight: 400; font-size: 12px; }
+nav.links { margin-left: auto; display: flex; gap: 16px; flex-wrap: wrap; font-size: 14px; }
+nav.links a { text-decoration: none; color: var(--text-2); }
+nav.links a:hover { color: var(--accent); }
+.hero { padding-top: clamp(36px, 7vw, 72px); padding-bottom: 28px; }
+.eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); }
+h1 { font-size: clamp(30px, 5vw, 46px); line-height: 1.15; margin: 10px 0 16px; letter-spacing: -.01em; }
+.lede { font-size: clamp(17px, 2.2vw, 19px); color: var(--text-2); max-width: 760px; margin: 0 0 24px; }
+.cta { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 26px; }
+.btn { display: inline-block; padding: 10px 16px; border-radius: 9px; border: 1px solid var(--border); background: var(--card); color: var(--text); text-decoration: none; font-weight: 600; font-size: 15px; }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px; }
+.fact { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; font-size: 14px; }
+.fact b { display: block; font-size: 12px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+.note { background: var(--warn-soft); border: 1px solid var(--warn-border); border-radius: 10px; padding: 12px 16px; font-size: 14px; margin: 22px 0 0; }
+section { padding: 44px 0; border-top: 1px solid var(--border); }
+h2 { font-size: clamp(24px, 3.4vw, 30px); margin: 0 0 10px; }
+h3 { font-size: 18px; margin: 0 0 6px; }
+.sub { color: var(--text-2); max-width: 760px; margin: 0 0 24px; }
+.grid3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+.card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 18px; }
+.card p { margin: 0; color: var(--text-2); font-size: 15px; }
+figure { margin: 0 0 34px; }
+figure img { display: block; width: 100%; border: 1px solid var(--border); border-radius: 12px; background: var(--card); }
+figcaption { margin-top: 10px; font-size: 15px; color: var(--text-2); }
+figcaption .cap { display: inline-block; font-size: 12px; font-weight: 600; color: var(--accent); background: var(--accent-soft); border-radius: 999px; padding: 1px 9px; margin-right: 6px; }
+.step { font-size: 13px; font-weight: 700; color: var(--muted); margin-bottom: 6px; }
+.two { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 22px; align-items: start; }
+.table-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; background: var(--card); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+th { background: var(--card-2); font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+code, pre { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 13px; }
+code { background: var(--card-2); padding: 1px 5px; border-radius: 4px; }
+pre { background: var(--card-2); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; overflow-x: auto; margin: 0 0 14px; }
+pre code { background: none; padding: 0; }
+ul { padding-left: 20px; }
+li { margin: 4px 0; }
+footer { border-top: 1px solid var(--border); padding: 28px 0 44px; color: var(--muted); font-size: 14px; }
+@media (max-width: 560px) { nav.links { margin-left: 0; width: 100%; gap: 12px; } }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <div class="mark" aria-hidden="true">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4h7a4 4 0 0 1 4 4v12a3 3 0 0 0-3-3H2z"/><path d="M22 4h-7a4 4 0 0 0-4 4v12a3 3 0 0 1 3-3h8z"/></svg>
+    </div>
+    <div class="brand">Wealth Advisor Assistant<small>A Snowflake example on synthetic data</small></div>
+    <nav class="links" aria-label="Page sections">
+      <a href="#walkthrough">Walkthrough</a>
+      <a href="#how-it-works">How it works</a>
+      <a href="#get-started">Get started</a>
+      <a href="https://github.com/sfc-gh-ooral/sfguide-wealth-advisor-assistant">Repository</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+<div class="wrap hero" id="problem">
+  <div class="eyebrow">Wealth Management · Advisory</div>
+  <h1>Give every advisor a morning brief and a coach that only sees their own clients</h1>
+  <p class="lede">An advisor with a few hundred households can't spot everything. Idle cash, a concentrated stock, a first-year required minimum distribution (RMD), or a client who's quietly drifting away are scattered across systems. This example ranks those opportunities each morning, explains each one with AI, drafts the meeting prep, and answers questions about the book. Each advisor sees only their own clients, and supervision sees every AI interaction.</p>
+  <div class="cta">
+    <a class="btn primary" href="try/">Try the example in your browser</a>
+    <a class="btn" href="https://github.com/sfc-gh-ooral/sfguide-wealth-advisor-assistant">View the repository</a>
+  </div>
+  <div class="facts">
+    <div class="fact"><b>No-account mode</b>Runs in the browser on synthetic data; nothing to install</div>
+    <div class="fact"><b>Live mode</b>Enterprise Edition; Cortex AI functions, Agents, Analyst, Search</div>
+    <div class="fact"><b>Setup time</b>About 10 minutes in one Snowsight worksheet</div>
+    <div class="fact"><b>Measured cost</b>About 0.6 warehouse credits on XSMALL in our test, plus AI token usage</div>
+  </div>
+  <p class="note"><strong>Synthetic data, illustrative logic.</strong> Every person, firm, fund, and ticker is fictional. This is not investment, tax, regulatory, or compliance advice, and it isn't a production system. Next best actions are suggestions for an advisor to review.</p>
+</div>
+
+<section>
+  <div class="wrap">
+    <h2>Who it's for</h2>
+    <div class="grid3">
+      <div class="card"><h3>Advisors</h3><p>A ranked morning brief, a household 360 before each meeting, and a coach to ask "who should I call about RMDs?"</p></div>
+      <div class="card"><h3>Branch managers</h3><p>The same view across every advisor in the branch, with a coaching table for idle cash, RMDs, and attrition risk.</p></div>
+      <div class="card"><h3>Supervision and compliance</h3><p>Every AI prompt and response in an append-only log, with the user, role, sources, guardrail result, and latency.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="walkthrough">
+  <div class="wrap">
+    <h2>Walkthrough</h2>
+    <p class="sub">Screenshots of the running app on its synthetic data set. Advisor A, Dana Whitfield, manages 140 households in the fictional Lakeside branch.</p>
+
+    <figure>
+      <div class="step">1 · Morning brief</div>
+      <img src="images/01-morning-brief.png" alt="Morning brief for Advisor A: KPIs, then five ranked next best actions: Martinez attrition risk, 18 households with idle cash, Okafor concentration, 9 RMD clients, and an outgoing transfer" loading="lazy">
+      <figcaption><span class="cap">Row access policy · SQL rules</span>The top five next best actions, each with its expected impact and reason. Rules in SQL find them, and a row access policy scopes them to this advisor's book.</figcaption>
+    </figure>
+
+    <figure>
+      <div class="step">2 · The cash drag action</div>
+      <img src="images/02-cash-drag.png" alt="The idle cash action: an AI explanation with why now and a suggested next step, labeled Sample AI response, then Schedule call selected with a note: Call the top five this week; ask what the cash is for" loading="lazy">
+      <figcaption><span class="cap">AI_COMPLETE with Cortex Guard</span>18 households have held more than 10% cash for six or more months, about $1.77M in total on this synthetic data set. An AI explanation says why it matters now, and the advisor records a decision (schedule call, snooze, or done) with a note.</figcaption>
+    </figure>
+
+    <figure>
+      <div class="step">3 · Client prep for the concentrated household</div>
+      <img src="images/03-client-prep.png" alt="Okafor household 360: 30 percent in Northwind Robotics highlighted, allocation vs. model chart, cash and logins trend, accounts, life events, CRM notes with sentiment, and an AI-drafted meeting agenda" loading="lazy">
+      <figcaption><span class="cap">AI_SENTIMENT · AI_COMPLETE</span>A household 360 for the Okafor household, which is 30% in one stock. It shows drift against the model, notes with sentiment, life events, and an AI-drafted agenda and talking points for the advisor to edit.</figcaption>
+    </figure>
+
+    <figure>
+      <div class="step">4 · The coach answers the RMD question</div>
+      <img src="images/04-coach.png" alt="Coach chat: the question 'Which clients should I call about RMDs this month?' answered with a table of 9 clients turning 73 and guidance from the RMD playbook" loading="lazy">
+      <figcaption><span class="cap">Cortex Agent · Cortex Analyst · Cortex Search</span>The coach finds the 9 clients who turn 73 this year and hold an IRA, and cites the firm's RMD playbook. Cortex Analyst answers from a semantic view of the book, and Cortex Search finds the playbook.</figcaption>
+    </figure>
+
+    <figure>
+      <div class="step">5 · "View as" proves isolation</div>
+      <img src="images/05-view-as.png" alt="Summarize the Martinez household asked as Advisor A, Advisor B, and the branch manager side by side: A and the branch manager get the full brief, Advisor B is told the household is not in their book; each column has a Row access policy applied badge" loading="lazy">
+      <figcaption><span class="cap">Row access policy · caller's rights</span>One question, asked as three personas. Advisor A and the branch manager get the Martinez brief, and Advisor B is told the household isn't in their book. Asked about RMDs, the same three return 9, 4, and 22 clients. In live mode, the agent runs as the caller's role, so the row access policy decides what it can see.</figcaption>
+    </figure>
+
+    <figure>
+      <div class="step">6 · The supervision trail</div>
+      <img src="images/06-supervision.png" alt="Supervision log: a table of AI interactions with time, user, role, surface, prompt, guardrail result, and latency, one row expanded to show prompt, sources, and response, and agent traces below" loading="lazy">
+      <figcaption><span class="cap">Append-only log · AI Observability</span>Every prompt and response, with the user, role, sources, guardrail result, and latency. Advisors can add entries but can't read or change them. Agent traces come from AI Observability.</figcaption>
+    </figure>
+
+    <figure>
+      <div class="step">Also: book overview</div>
+      <img src="images/07-book-overview.png" alt="Book overview: AUM and net flow KPIs, AUM trend, net flows by month, household segmentation, drift vs. model, and a household explorer with filters" loading="lazy">
+      <figcaption><span class="cap">Row access policy</span>AUM and flows, segmentation, drift against each model, and a filterable household explorer. Branch managers also get a coaching table across advisors.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section id="how-it-works">
+  <div class="wrap">
+    <h2>How it works</h2>
+    <p class="sub">Each capability below ran in live mode on a Snowflake Enterprise account in November 2026.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Step</th><th>Snowflake capability</th><th>What it does here</th></tr></thead>
+        <tbody>
+          <tr><td>Isolation</td><td><a href="https://docs.snowflake.com/en/user-guide/security-row-intro">Row access policies</a></td><td>Each persona role sees only its advisors' households in every table: 140, 118, and 1,143 households for Advisor A, Advisor B, and the branch manager.</td></tr>
+          <tr><td>Next best actions</td><td>SQL views, materialized into policy-scoped tables</td><td>Rules for attrition risk, outgoing transfers, concentration, idle cash, RMDs, and drift.</td></tr>
+          <tr><td>Note signals</td><td><a href="https://docs.snowflake.com/en/sql-reference/functions/ai_sentiment">AI_SENTIMENT</a></td><td>Scores recent CRM notes. Negative notes feed the rules-based attrition score.</td></tr>
+          <tr><td>Explanations and agendas</td><td><a href="https://docs.snowflake.com/en/sql-reference/functions/ai_complete-single-string">AI_COMPLETE</a> with Cortex Guard</td><td>Drafts explanations and meeting prep from household facts, with <code>guardrails: TRUE</code>.</td></tr>
+          <tr><td>Coach</td><td><a href="https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-agents">Cortex Agents</a> with Cortex Analyst and Cortex Search</td><td>Answers questions from a semantic view of the book and firm playbooks. It runs as the caller, so the policies apply.</td></tr>
+          <tr><td>Supervision</td><td>Append-only table and <a href="https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-agents-monitor">AI Observability</a></td><td>Advisors insert into the log but can't read or change it. The supervisor role reads the log and agent traces, not the book.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="sub" style="margin-top:18px">One design choice worth knowing: <a href="https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-search/query-cortex-search-service">Cortex Search runs with the owner's rights</a>, so it doesn't apply the caller's row access policies. In this example it indexes only firm-wide playbooks, and every client record goes through the semantic view.</p>
+  </div>
+</section>
+
+<section id="get-started">
+  <div class="wrap">
+    <h2>Get started</h2>
+    <div class="two">
+      <div>
+        <h3>No account</h3>
+        <p class="sub" style="margin-bottom:12px">Open the <a href="try/">hosted example</a>, or run it locally with Node.js 20.19 or later:</p>
+<pre><code>git clone https://github.com/sfc-gh-ooral/sfguide-wealth-advisor-assistant.git
+cd sfguide-wealth-advisor-assistant
+npm install
+npm run dev</code></pre>
+        <p class="sub">AI answers in this mode are scripted and labeled <strong>Sample AI response</strong>.</p>
+      </div>
+      <div>
+        <h3>Your Snowflake account</h3>
+        <ol>
+          <li>Run <a href="https://github.com/sfc-gh-ooral/sfguide-wealth-advisor-assistant/blob/main/sql/setup.sql"><code>sql/setup.sql</code></a> in a Snowsight worksheet. It creates a dedicated database, an XSMALL warehouse, and least-privilege roles, and loads the synthetic data from the repository.</li>
+          <li>Register a key pair for your user and copy <code>.env.example</code> to <code>.env.local</code>.</li>
+          <li>Run <code>npm run dev</code>. Each screen shows the live role and measured latency.</li>
+          <li>When you're done, run <code>sql/cleanup.sql</code>.</li>
+        </ol>
+        <p class="sub">Requires Enterprise Edition or higher. The README lists every object created, the expected cost, and the full steps.</p>
+      </div>
+    </div>
+    <h3 style="margin-top:20px">Customize with Cortex Code</h3>
+    <ul>
+      <li>"Map these tables to my CRM and custodial feeds, and propose the advisor-to-household mapping for the row access policy."</li>
+      <li>"Add a next best action for held-away 401(k) rollovers, with eligibility rules I can review."</li>
+      <li>"Load-test the coach with 50 concurrent advisors and report p50/p95 latency and cost per call."</li>
+    </ul>
+  </div>
+</section>
+
+<section id="limits">
+  <div class="wrap">
+    <h2>Limits and disclaimer</h2>
+    <ul>
+      <li>The attrition score is rules-based, not a trained model. Expected-impact values are illustrative estimates.</li>
+      <li>Results such as "18 households" and "9 RMD clients" are planted stories on this synthetic data set.</li>
+      <li>Persona isolation uses one Snowflake role per persona for readability. In production you'd usually key the policy on the user or an identity-provider attribute.</li>
+      <li>Latency depends on your account, region, model, and warehouse. The app shows measured times in live mode only.</li>
+    </ul>
+    <p class="note">This is an illustrative example provided as is. It is not an official Snowflake product, it isn't supported by Snowflake Support, and it contains no customer data. Apache 2.0 license.</p>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">Owner: Oz Oral · Last reviewed: November 2026 · <a href="https://github.com/sfc-gh-ooral/sfguide-wealth-advisor-assistant">Repository</a> · <a href="https://docs.snowflake.com/">Snowflake documentation</a></div>
+</footer>
+</body>
+</html>
