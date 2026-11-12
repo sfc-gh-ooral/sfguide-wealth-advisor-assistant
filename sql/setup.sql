@@ -52,9 +52,9 @@ GRANT DATABASE ROLE SNOWFLAKE.CORTEX_USER TO ROLE WAA_BRANCH_MGR;
 GRANT DATABASE ROLE SNOWFLAKE.CORTEX_USER TO ROLE WAA_SUPERVISOR;  -- reads agent traces
 
 -- Read-only access to the public GitHub repository that holds the synthetic CSVs.
-CREATE API INTEGRATION IF NOT EXISTS WAA_GIT_API
+CREATE OR REPLACE API INTEGRATION WAA_GIT_API
   API_PROVIDER = git_https_api
-  API_ALLOWED_PREFIXES = ('https://github.com/sfc-gh-ooral/sfguide-wealth-advisor-assistant')
+  API_ALLOWED_PREFIXES = ('https://github.com/sfc-gh-ooral/')
   ENABLED = TRUE
   COMMENT = 'Wealth Advisor Assistant example: public repo, no credentials';
 GRANT USAGE ON INTEGRATION WAA_GIT_API TO ROLE WAA_DEMO_ROLE;
