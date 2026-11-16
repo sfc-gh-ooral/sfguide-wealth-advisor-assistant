@@ -25,7 +25,7 @@ export default function Supervision() {
     <div className="space-y-4">
       <div className="flex items-end justify-between gap-3 flex-wrap">
         <div>
-          <h1 className="text-xl font-semibold">Supervision log</h1>
+          <h1 className="page-title">Supervision log</h1>
           <p className="text-sm muted">
             Viewing as supervision reviewer{live ? ' (role WAA_SUPERVISOR, read-only)' : ''}. {live ? 'Read from APP.AI_INTERACTION_LOG, which advisor roles can insert into but not change or read.' : 'In no-account mode, entries from this browser session are kept locally, alongside a few sample entries.'}
           </p>

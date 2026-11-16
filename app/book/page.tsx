@@ -61,7 +61,7 @@ export default function BookOverview() {
     <div className="space-y-5">
       <div className="flex items-end justify-between gap-3 flex-wrap">
         <div>
-          <h1 className="text-xl font-semibold">Book overview</h1>
+          <h1 className="page-title">Book overview</h1>
           <p className="text-sm muted">{p.advisorIds === 'BRANCH' ? 'Lakeside branch, all advisors' : `${p.person}'s book`} · as of {book.asOf}</p>
         </div>
         <div className="flex items-center gap-2 flex-wrap"><RlsBadge role={book.role} /><SourceBadge p={book} /></div>

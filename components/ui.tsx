@@ -26,9 +26,9 @@ export function Card({ title, right, children, className = '' }: { title?: React
 
 export function Kpi({ label, value, sub }: { label: string; value: string; sub?: string }) {
   return (
-    <div className="card p-4">
-      <div className="text-[11px] uppercase tracking-wider muted mb-1">{label}</div>
-      <div className="text-2xl font-semibold tabular">{value}</div>
+    <div className="card kpi card-hover p-4">
+      <div className="text-[11px] uppercase tracking-wider muted mb-1 font-semibold">{label}</div>
+      <div className="kpi-value text-[26px] font-bold tabular tracking-tight">{value}</div>
       {sub && <div className="text-xs muted mt-1">{sub}</div>}
     </div>
   );

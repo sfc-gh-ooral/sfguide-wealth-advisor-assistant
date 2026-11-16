@@ -3,6 +3,7 @@
 import type { ActionInput, AdvisorData, BookView } from './advisor-data';
 import { BOOK, buildBrief, canSee, scopedActions, scopedHouseholds, visibleAdvisorIds } from './mock-source';
 import { PERSONAS } from './personas';
+import { SAMPLE_DELAY_MS } from './sample-timing';
 import { sampleAgenda, sampleCoach, sampleExplanation } from './sample-ai';
 import type { AgentTrace, AiAnswer, BookMonth, HouseholdDetail, LogEntry, PersonaId } from './types';
 
@@ -28,6 +29,9 @@ function appendLog(e: LogEntry) {
 }
 const userFor = (p: PersonaId) => PERSONAS[p].person.toLowerCase().replace(' ', '.');
 let seq = 0;
+
+// Sample answers wait about as long as a real Cortex call would, with a little jitter.
+const think = (ms: number) => new Promise((r) => setTimeout(r, ms * (0.85 + Math.random() * 0.3)));
 
 function answer(persona: PersonaId, surface: string, prompt: string, r: { text: string; sources: string[] }, flagged = false): AiAnswer {
   const id = `sample-${Date.now()}-${++seq}`;
@@ -75,14 +79,17 @@ export const mockData: AdvisorData = {
     return { source: 'mock', role: PERSONAS[persona].role, summary, detail: await loadDetail(id) };
   },
   async explain(persona, item) {
+    await think(SAMPLE_DELAY_MS.explain);
     return answer(persona, 'explanation', `Explain next best action: ${item.title}`, sampleExplanation(item));
   },
   async agenda(persona, householdId) {
+    await think(SAMPLE_DELAY_MS.agenda);
     const v = await mockData.household(persona, householdId);
     if (!v) return answer(persona, 'agenda', `Draft agenda for ${householdId}`, { text: 'This household is not visible to your role.', sources: [] });
     return answer(persona, 'agenda', `Draft meeting agenda and talking points for ${v.summary.name}`, sampleAgenda(v.summary, v.detail));
   },
   async coach(persona, question) {
+    await think(SAMPLE_DELAY_MS.coach);
     if (INJECTION.test(question)) return answer(persona, 'coach', question, { text: "I can't do that. I can only work with households in your own book or that your role is allowed to see, and I won't pull firm-wide client lists or contact details. This request is recorded in the supervision log.", sources: [] });
     return answer(persona, 'coach', question, sampleCoach(persona, question));
   },

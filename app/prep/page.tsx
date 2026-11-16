@@ -8,6 +8,7 @@ import { Suspense, useEffect, useState } from 'react';
 import { Bar, BarChart, CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { usePersona } from '@/components/Shell';
 import { Card, Markdown, PoweredBy, RlsBadge, SampleAiBadge, SourceBadge, Thinking, money } from '@/components/ui';
+import { Reasoning } from '@/components/Reasoning';
 import { useAsync } from '@/components/useAsync';
 import { data } from '@/lib/client';
 import { PERSONAS } from '@/lib/personas';
@@ -25,7 +26,7 @@ function Picker() {
   return (
     <div className="space-y-4">
       <div className="flex items-end justify-between gap-3 flex-wrap">
-        <div><h1 className="text-xl font-semibold">Client prep</h1><p className="text-sm muted">Pick a household to prepare for. Households with open actions are listed first.</p></div>
+        <div><h1 className="page-title">Client prep</h1><p className="text-sm muted">Pick a household to prepare for. Households with open actions are listed first.</p></div>
         <RlsBadge role={book.role} />
       </div>
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -74,7 +75,7 @@ function Prep({ id }: { id: string }) {
       <div className="flex items-end justify-between gap-3 flex-wrap">
         <div>
           <Link href="/prep" className="text-xs muted underline-offset-2 hover:underline">Client prep</Link>
-          <h1 className="text-xl font-semibold">{h.name}</h1>
+          <h1 className="page-title">{h.name}</h1>
           <p className="text-sm text-2">{d.clients.map((c) => `${c.first_name} (${c.birth_date.slice(0, 4)})`).join(' · ')} · {h.city} · {h.segment} · model {h.model}</p>
         </div>
         <div className="flex items-center gap-2 flex-wrap"><RlsBadge role={view.role} /><SourceBadge p={view} /></div>
@@ -149,13 +150,13 @@ function Prep({ id }: { id: string }) {
                 <button className="btn btn-primary" onClick={drafting}><Sparkles className="w-3.5 h-3.5" aria-hidden />Draft agenda</button>
               </div>
             )}
-            {ai === 'loading' && <Thinking label="Drafting agenda" />}
+            {ai === 'loading' && <Reasoning kind="agenda" />}
             {ai && ai !== 'loading' && ('error' in ai ? <p className="text-sm" style={{ color: 'var(--negative)' }}>{ai.error}</p> : (
-              <>
+              <div className="ai-panel">
                 <Markdown text={ai.text} />
                 <div className="flex items-center gap-2 mt-2 flex-wrap"><SourceBadge p={ai} /></div>
                 <p className="text-[11px] muted mt-2">Draft for the advisor to review and edit. Logged to the supervision trail.</p>
-              </>
+              </div>
             ))}
           </Card>
 

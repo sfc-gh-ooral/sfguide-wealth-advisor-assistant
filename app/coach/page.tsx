@@ -5,6 +5,7 @@ import { Bot, Send, Users } from 'lucide-react';
 import { useState } from 'react';
 import { usePersona } from '@/components/Shell';
 import { Card, Markdown, PoweredBy, RlsBadge, SampleAiBadge, SourceBadge, Thinking } from '@/components/ui';
+import { Reasoning } from '@/components/Reasoning';
 import { data } from '@/lib/client';
 import { PERSONAS, PERSONA_IDS } from '@/lib/personas';
 import type { AiAnswer, PersonaId } from '@/lib/types';
@@ -19,7 +20,7 @@ type Msg = { role: 'user'; text: string; persona: PersonaId } | { role: 'assista
 
 function Answer({ a }: { a: AiAnswer }) {
   return (
-    <>
+    <div className="ai-panel">
       <div className="flex items-center gap-2 mb-2 flex-wrap">
         {a.source === 'mock' ? <SampleAiBadge /> : <PoweredBy>Cortex Agents (Analyst + Search)</PoweredBy>}
         <RlsBadge role={a.role} />
@@ -28,7 +29,7 @@ function Answer({ a }: { a: AiAnswer }) {
       </div>
       <Markdown text={a.text} />
       {a.sources.length > 0 && <div className="text-[11px] muted">Sources: {a.sources.join(' · ')}</div>}
-    </>
+    </div>
   );
 }
 
@@ -67,7 +68,7 @@ export default function Coach() {
     <div className="space-y-4">
       <div className="flex items-end justify-between gap-3 flex-wrap">
         <div>
-          <h1 className="text-xl font-semibold">Coach</h1>
+          <h1 className="page-title">Coach</h1>
           <p className="text-sm muted">Ask about your book. Answers only use households your role can see.</p>
         </div>
         <RlsBadge role={PERSONAS[persona].role} />
@@ -89,8 +90,8 @@ export default function Coach() {
           ) : (
             <div key={i} className="flex gap-3">
               <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: 'var(--accent-soft)', color: 'var(--accent)' }}><Bot className="w-4 h-4" aria-hidden /></div>
-              <div className="flex-1 min-w-0 rounded-xl p-3" style={{ background: 'var(--surface-2)' }}>
-                {m.answer ? <Answer a={m.answer} /> : m.error ? <p className="text-sm" style={{ color: 'var(--negative)' }}>{m.error}</p> : <Thinking label="Asking the coach" />}
+              <div className="flex-1 min-w-0">
+                {m.answer ? <Answer a={m.answer} /> : m.error ? <p className="text-sm" style={{ color: 'var(--negative)' }}>{m.error}</p> : <Reasoning kind="coach" />}
               </div>
             </div>
           ))}
@@ -112,10 +113,10 @@ export default function Coach() {
             {PERSONA_IDS.map((p) => {
               const r = compare.results[p];
               return (
-                <div key={p} className="rounded-xl p-3 min-w-0" style={{ background: 'var(--surface-2)' }}>
+                <div key={p} className="card card-hover p-3 min-w-0">
                   <div className="text-sm font-semibold">{PERSONAS[p].label}</div>
                   <div className="text-xs muted mb-2">{PERSONAS[p].person} · role {PERSONAS[p].role}</div>
-                  {r === 'loading' || r === undefined ? <Thinking /> : typeof r === 'string' ? <p className="text-sm" style={{ color: 'var(--negative)' }}>{r}</p> : <Answer a={r} />}
+                  {r === 'loading' || r === undefined ? <Reasoning kind="coach" compact /> : typeof r === 'string' ? <p className="text-sm" style={{ color: 'var(--negative)' }}>{r}</p> : <Answer a={r} />}
                 </div>
               );
             })}

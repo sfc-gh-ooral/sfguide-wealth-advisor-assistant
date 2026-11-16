@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { usePersona } from '@/components/Shell';
 import { Card, Kpi, Markdown, PoweredBy, RlsBadge, SampleAiBadge, SourceBadge, Thinking, money } from '@/components/ui';
+import { Reasoning } from '@/components/Reasoning';
 import { useAsync } from '@/components/useAsync';
 import { data } from '@/lib/client';
 import { PERSONAS } from '@/lib/personas';
@@ -40,10 +41,10 @@ function BriefCard({ item, rank, advisor }: { item: BriefItem; rank: number; adv
   };
 
   return (
-    <article className="card p-4" aria-labelledby={`t-${item.key}`} style={saved ? { opacity: 0.7 } : undefined}>
+    <article className="card card-hover p-4" aria-labelledby={`t-${item.key}`} style={saved ? { opacity: 0.7 } : undefined}>
       <div className="flex items-start gap-3">
         <div className="text-xs font-semibold muted w-5 pt-1 tabular">{rank}</div>
-        <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style={{ background: 'var(--accent-soft)', color: 'var(--accent)' }}><Icon className="w-4 h-4" aria-hidden /></div>
+        <div className="icon-tile w-10 h-10 rounded-xl flex items-center justify-center shrink-0"><Icon className="w-4 h-4" aria-hidden /></div>
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-3 flex-wrap">
             <div>
@@ -60,7 +61,7 @@ function BriefCard({ item, rank, advisor }: { item: BriefItem; rank: number; adv
             {multi
               ? <button className="btn" onClick={() => setShowHH(!showHH)} aria-expanded={showHH}>{showHH ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}{item.households.length} households</button>
               : <Link className="btn no-underline" href={prepHref}>Open client prep</Link>}
-            {!ai && <button className="btn" onClick={explain}><Sparkles className="w-3.5 h-3.5" aria-hidden />AI explanation</button>}
+            {!ai && <button className="btn btn-ai" onClick={explain}><Sparkles className="w-3.5 h-3.5" aria-hidden />AI explanation</button>}
             {saved && <span className="text-xs font-medium" style={{ color: 'var(--positive)' }}>Recorded: {saved}{note ? ` · "${note}"` : ''}</span>}
           </div>
 
@@ -76,16 +77,16 @@ function BriefCard({ item, rank, advisor }: { item: BriefItem; rank: number; adv
           )}
 
           {ai && (
-            <div className="mt-3 rounded-lg p-3" style={{ background: 'var(--surface-2)' }}>
-              {ai === 'loading' ? <Thinking label="Drafting explanation" /> : 'error' in ai ? <p className="text-sm" style={{ color: 'var(--negative)' }}>{ai.error}</p> : (
-                <>
+            <div className="mt-3">
+              {ai === 'loading' ? <Reasoning kind="explain" /> : 'error' in ai ? <p className="text-sm" style={{ color: 'var(--negative)' }}>{ai.error}</p> : (
+                <div className="ai-panel">
                   <div className="flex items-center gap-2 mb-2 flex-wrap">
                     {ai.source === 'mock' ? <SampleAiBadge /> : <PoweredBy>AI_COMPLETE with Cortex Guard</PoweredBy>}
                     <SourceBadge p={ai} />
                   </div>
                   <Markdown text={ai.text} />
                   <div className="text-[11px] muted">Sources: {ai.sources.join(' · ')}</div>
-                </>
+                </div>
               )}
             </div>
           )}
@@ -123,20 +124,21 @@ export default function MorningBrief() {
 
   return (
     <div className="space-y-5">
-      <div className="flex items-end justify-between gap-3 flex-wrap">
-        <div>
-          <h1 className="text-xl font-semibold">Good morning, {p.person.split(' ')[0]}</h1>
+      <div className="hero flex items-end justify-between gap-3 flex-wrap">
+        <div className="relative z-10">
+          <div className="text-[11px] font-semibold uppercase tracking-[0.14em] mb-1" style={{ color: 'rgba(255,255,255,.75)' }}>Morning brief</div>
+          <h1 className="page-title text-white">Good morning, {p.person.split(' ')[0]}</h1>
           <p className="text-sm muted">Data as of {book.asOf}. Top {top.length} next best actions{p.advisorIds === 'BRANCH' ? ' across the Lakeside branch' : ' in your book'}, ranked by priority and impact.</p>
         </div>
-        <div className="flex items-center gap-2 flex-wrap"><RlsBadge role={book.role} /><SourceBadge p={book} /></div>
+        <div className="relative z-10 flex items-center gap-2 flex-wrap rounded-full px-2 py-1" style={{ background: 'rgba(255,255,255,.92)' }}><RlsBadge role={book.role} /><SourceBadge p={book} /></div>
       </div>
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="stagger grid grid-cols-2 lg:grid-cols-4 gap-3">
         <Kpi label="Households" value={book.households.length.toLocaleString()} sub={p.advisorIds === 'BRANCH' ? `${book.advisors.length} advisors` : 'In your book'} />
         <Kpi label="AUM" value={money(aum)} sub="Assets under management" />
         <Kpi label="Open actions" value={book.actions.length.toLocaleString()} sub="Rules-based, all types" />
         <Kpi label="Attrition watch" value={String(book.households.filter((h) => h.attrition >= 70).length)} sub="Score ≥ 70 (rules, not a model)" />
       </div>
-      <div className="space-y-3">
+      <div className="stagger space-y-3">
         {top.map((item, i) => <BriefCard key={`${persona}-${item.key}`} item={item} rank={i + 1} advisor={p.advisorIds === 'BRANCH' ? names.get(item.advisorId) : undefined} />)}
       </div>
       <p className="text-xs muted">Expected impact values are illustrative estimates from the rules in data/README.md. Suggestions are for advisor review only; not investment or tax advice.</p>
