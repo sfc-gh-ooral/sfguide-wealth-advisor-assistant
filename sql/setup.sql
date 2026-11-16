@@ -356,8 +356,12 @@ CREATE OR REPLACE AGENT ADVISOR_COACH
       Only discuss households returned by your tools; never guess about households you cannot see.
       If a household is not found, say it is not in the user's book or not visible to their role.
     orchestration: >
+      Be fast: answer with as few tool calls as possible, usually exactly one.
       Use BookAnalyst for any question about households, clients, AUM, cash, concentration, RMDs, notes,
-      sentiment, attrition, or next best actions. Use FirmPlaybooks for how-to guidance, policies, and products.
+      sentiment, attrition, or next best actions. Ask it for everything you need in a single request
+      rather than several follow-up queries.
+      Use FirmPlaybooks only when the user asks how to do something, or asks about a policy, process, or product;
+      do not search playbooks for pure data questions.
       For "RMDs this month" questions, list clients where turns_73_in_2026 is true and has_ira is true.
     response: >
       Be concise and practical. Use short bullets. Name households and clients. Cite the playbook title

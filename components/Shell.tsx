@@ -5,6 +5,7 @@ import { BookOpen, ClipboardList, LayoutDashboard, Menu, MessageSquare, ShieldCh
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+import { ModeChip } from '@/components/ModeChip';
 import { HOSTED_EXAMPLE } from '@/lib/hosted';
 import { PERSONAS, PERSONA_IDS, isPersonaId } from '@/lib/personas';
 import type { PersonaId } from '@/lib/types';
@@ -72,7 +73,8 @@ export default function Shell({ children }: { children: ReactNode }) {
               <div className="text-sm font-semibold truncate">{p.person}</div>
               <div className="text-xs muted truncate">{p.title}</div>
             </div>
-            <div className="ml-auto flex items-center gap-2" role="group" aria-label="View as persona">
+            <div className="ml-auto"><ModeChip /></div>
+            <div className="flex items-center gap-2" role="group" aria-label="View as persona">
               <span className="text-xs muted hidden sm:inline">View as</span>
               <div className="seg flex">
                 {PERSONA_IDS.map((id) => (
