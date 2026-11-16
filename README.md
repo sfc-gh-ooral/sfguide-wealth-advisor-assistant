@@ -141,13 +141,23 @@ lib/advisor-data.ts  Data interface used by every screen
 lib/mock-data.ts     No-account implementation (also runs in the browser for /try/)
 lib/live-data.ts     Snowflake implementation (server only)
 lib/snowflake.ts     Per-role connections, bind variables
-scripts/             generate-data.mjs (seeded), build-hosted-example.mjs
+scripts/             generate-data.mjs (seeded), build-hosted-example.mjs, capture-screenshots.mjs
 sql/                 setup.sql, cleanup.sql
 data/                Synthetic CSVs and data README
 docs/                GitHub Pages guide, screenshots, and the /try/ static example
 ```
 
 `npm run build:example` builds the static, no-account example into `docs/try/`.
+
+### Refresh the screenshots
+
+```bash
+npx playwright install chromium   # first time only
+npm run build:example
+npm run capture                   # COLOR_SCHEME=light npm run capture for light mode
+```
+
+`scripts/capture-screenshots.mjs` serves `docs/try/` locally and clicks through the walkthrough in a fresh headless browser at a fixed 1600×1000 viewport. It writes the landing-page images (`docs/images/*.png`, 2000×1250) and the catalog cards (`docs/catalog/*.jpg`, 960×600). Image size never depends on your screen, and no sign-in or account details can appear. Edit the `SHOTS` list when screens change, and review every image before publishing.
 
 ## License and disclaimer
 
