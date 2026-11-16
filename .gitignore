@@ -41,3 +41,6 @@ yarn-error.log*
 # keys and generated build output
 *.p8
 /out/
+
+# Snowflake driver log (can include account details)
+snowflake.log

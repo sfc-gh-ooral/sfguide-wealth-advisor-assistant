@@ -17,6 +17,7 @@ This is a Snowflake example on **synthetic data**: a Next.js app with a no-accou
 | Client prep | Household 360 (accounts, holdings, concentration, drift, cash and logins, life events, notes, cases) and an AI-drafted agenda | `AI_SENTIMENT` on notes, `AI_COMPLETE` with Cortex Guard |
 | Coach | Chat with an agent about your book; **Ask as all three** runs one question as each persona side by side | Cortex Agent with Cortex Analyst (semantic view) and Cortex Search; the agent runs as the caller's role, so row access policies apply |
 | View as | Advisor A / Advisor B / Branch manager switcher with a "Row access policy applied" badge | One Snowflake role per persona; `CURRENT_ROLE()` drives the policies |
+| Sample / Live switch | Header switch that shows which mode is on. Sample keeps the bundled data even with a connection; Live with no connection shows setup steps instead of asking for credentials. AI buttons show staged reasoning steps; in Sample mode a scripted answer arrives after a few seconds | `/api/mode` reports whether `.env.local` is configured; live calls report measured latency and never fall back to sample data |
 | Supervision log | Every AI prompt and response with user, role, time, sources, guardrail result, and measured latency; plus agent traces | Append-only `APP.AI_INTERACTION_LOG` (insert-only for advisors), AI Observability via `GET_AI_OBSERVABILITY_EVENTS` |
 
 ### Story on this synthetic data set
