@@ -3,11 +3,12 @@
 import type { AdvisorData } from './advisor-data';
 import { HOSTED_EXAMPLE } from './hosted';
 import { mockData } from './mock-data';
+import { preferSample } from './mode';
 
 type Op = keyof AdvisorData;
 
 async function call<T>(op: Op, args: unknown[]): Promise<T> {
-  const res = await fetch('/api/data', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ op, args }) });
+  const res = await fetch('/api/data', { method: 'POST', headers: { 'Content-Type': 'application/json', ...(preferSample() ? { 'x-waa-mode': 'sample' } : {}) }, body: JSON.stringify({ op, args }) });
   const json = await res.json();
   if (!res.ok) throw new Error(json.error ?? `Request failed (${res.status})`);
   return json as T;

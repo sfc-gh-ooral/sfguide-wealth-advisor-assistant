@@ -8,9 +8,10 @@ const api = "app/api";
 const parked = ".api-parked";
 if (existsSync(parked)) throw new Error(`${parked} exists; restore it to ${api} first.`);
 
-renameSync(api, parked);
-// Stale dev-server type stubs still reference the parked API routes, so start clean.
+// Stale dev-server type stubs still reference the parked API routes, so start clean. This runs
+// before the API is parked so a failure (for example, a running dev server) leaves it in place.
 rmSync(".next", { recursive: true, force: true });
+renameSync(api, parked);
 try {
   execSync("next build", { stdio: "inherit", env: { ...process.env, NEXT_PUBLIC_HOSTED_EXAMPLE: "true" } });
 } finally {
