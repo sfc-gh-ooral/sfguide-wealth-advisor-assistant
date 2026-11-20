@@ -88,7 +88,7 @@ function Prep({ id }: { id: string }) {
       </div>
 
       <div className="grid lg:grid-cols-3 gap-4">
-        <div className="lg:col-span-2 space-y-4">
+        <div className="lg:col-span-2 space-y-4 min-w-0">
           <Card title="Holdings and concentration">
             <div className="space-y-2">
               {d.holdings.slice(0, 8).map((x) => (
@@ -104,7 +104,7 @@ function Prep({ id }: { id: string }) {
           </Card>
 
           <Card title="Allocation vs. model">
-            <div style={{ height: 210 }}>
+            <div className="overflow-x-auto"><div className="min-w-[440px]" style={{ height: 210 }}>
               <ResponsiveContainer>
                 <BarChart data={d.drift} margin={{ left: 0, right: 8 }}>
                   <CartesianGrid stroke="var(--border)" vertical={false} />
@@ -116,7 +116,7 @@ function Prep({ id }: { id: string }) {
                   <Bar dataKey="actual" name="Actual" fill="var(--chart-1)" radius={[3, 3, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
-            </div>
+            </div></div>
           </Card>
 
           <Card title="Cash and portal logins, 12 months">

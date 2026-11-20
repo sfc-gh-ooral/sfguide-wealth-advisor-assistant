@@ -4,7 +4,7 @@
 import { BookOpen, ClipboardList, LayoutDashboard, Menu, MessageSquare, ShieldCheck, Sun, X } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
 import { ModeChip } from '@/components/ModeChip';
 import { HOSTED_EXAMPLE } from '@/lib/hosted';
 import { PERSONAS, PERSONA_IDS, isPersonaId } from '@/lib/personas';
@@ -30,6 +30,19 @@ export default function Shell({ children }: { children: ReactNode }) {
     if (isPersonaId(saved)) setPersonaState(saved);
   }, []);
   useEffect(() => setOpen(false), [pathname]);
+  // Mobile drawer: Escape closes, focus moves into the drawer on open and back to the toggle on close.
+  const toggleRef = useRef<HTMLButtonElement>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
+  const wasOpen = useRef(false);
+  useEffect(() => {
+    if (open) closeRef.current?.focus();
+    else if (wasOpen.current) toggleRef.current?.focus();
+    wasOpen.current = open;
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [open]);
   const setPersona = (p: PersonaId) => { setPersonaState(p); window.localStorage.setItem('waa-persona', p); };
   const p = PERSONAS[persona];
   const active = (href: string) => (href === '/' ? pathname === '/' : pathname.startsWith(href));
@@ -37,7 +50,7 @@ export default function Shell({ children }: { children: ReactNode }) {
   return (
     <PersonaContext.Provider value={{ persona, setPersona }}>
       <div className="min-h-screen flex">
-        <aside className={`sidebar fixed inset-y-0 left-0 z-40 w-60 flex flex-col border-r transition-transform md:translate-x-0 ${open ? 'translate-x-0' : '-translate-x-full'}`}
+        <aside id="main-nav" className={`sidebar fixed inset-y-0 left-0 z-40 w-60 flex flex-col border-r md:translate-x-0 md:visible ${open ? 'translate-x-0 transition-transform' : '-translate-x-full invisible transition-[transform,visibility]'}`}
           aria-label="Main navigation">
           <div className="px-5 py-5 border-b flex items-center gap-3" style={{ borderColor: 'rgba(255,255,255,.08)' }}>
             <div className="icon-tile w-9 h-9 rounded-xl flex items-center justify-center"><BookOpen className="w-4 h-4" aria-hidden /></div>
@@ -45,7 +58,7 @@ export default function Shell({ children }: { children: ReactNode }) {
               <div className="text-sm font-semibold leading-tight text-white">Wealth Advisor Assistant</div>
               <div className="text-[11px] muted">Example on synthetic data</div>
             </div>
-            <button className="md:hidden ml-auto btn !px-2" onClick={() => setOpen(false)} aria-label="Close menu"><X className="w-4 h-4" /></button>
+            <button ref={closeRef} className="md:hidden ml-auto btn !px-2" onClick={() => setOpen(false)} aria-label="Close menu"><X className="w-4 h-4" /></button>
           </div>
           <nav className="flex-1 px-3 py-3 space-y-1">
             {NAV.map(({ href, label, icon: Icon }) => (
@@ -68,7 +81,7 @@ export default function Shell({ children }: { children: ReactNode }) {
             </div>
           )}
           <header className="glass sticky top-0 z-30 flex items-center gap-3 px-4 md:px-8 py-3 border-b flex-wrap" style={{ borderColor: 'var(--border)' }}>
-            <button className="md:hidden btn !px-2" onClick={() => setOpen(true)} aria-label="Open menu"><Menu className="w-4 h-4" /></button>
+            <button ref={toggleRef} className="md:hidden btn !px-2" onClick={() => setOpen(true)} aria-label="Open menu" aria-expanded={open} aria-controls="main-nav"><Menu className="w-4 h-4" /></button>
             <div className="min-w-0">
               <div className="text-sm font-semibold truncate">{p.person}</div>
               <div className="text-xs muted truncate">{p.title}</div>
